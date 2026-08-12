@@ -1,0 +1,26 @@
+name: PR Summary (Groq + Doubao fallback)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: a62136920/pr-genie@v0.1.0
+        with:
+          mode: pr-summary
+          api-key: ${{ secrets.GROQ_API_KEY }}
+          api-base: https://api.groq.com/openai/v1
+          model: llama-3.1-8b-instant
+          fallback-api-key: ${{ secrets.DOUBAO_API_KEY }}
+          fallback-api-base: https://ark.cn-beijing.volces.com/api/v3
+          fallback-model: ep-20260227124242-vkgnb
+          language: zh

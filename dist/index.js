@@ -17581,12 +17581,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info2 = this._prepareRequest(verb, parsedUrl, headers);
+          let info4 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info2, data);
+            response = yield this.requestRaw(info4, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -17596,7 +17596,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info2, data);
+                return authenticationHandler.handleAuthentication(this, info4, data);
               } else {
                 return response;
               }
@@ -17619,8 +17619,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info2, data);
+              info4 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info4, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -17649,7 +17649,7 @@ var require_lib = __commonJS({
        * @param info
        * @param data
        */
-      requestRaw(info2, data) {
+      requestRaw(info4, data) {
         return __awaiter(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
             function callbackForResult(err, res) {
@@ -17661,7 +17661,7 @@ var require_lib = __commonJS({
                 resolve(res);
               }
             }
-            this.requestRawWithCallback(info2, data, callbackForResult);
+            this.requestRawWithCallback(info4, data, callbackForResult);
           });
         });
       }
@@ -17671,12 +17671,12 @@ var require_lib = __commonJS({
        * @param data
        * @param onResult
        */
-      requestRawWithCallback(info2, data, onResult) {
+      requestRawWithCallback(info4, data, onResult) {
         if (typeof data === "string") {
-          if (!info2.options.headers) {
-            info2.options.headers = {};
+          if (!info4.options.headers) {
+            info4.options.headers = {};
           }
-          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info4.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult(err, res) {
@@ -17685,7 +17685,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info2.httpModule.request(info2.options, (msg) => {
+        const req = info4.httpModule.request(info4.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult(void 0, res);
         });
@@ -17697,7 +17697,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error(`Request timeout: ${info2.options.path}`));
+          handleResult(new Error(`Request timeout: ${info4.options.path}`));
         });
         req.on("error", function(err) {
           handleResult(err);
@@ -17733,27 +17733,27 @@ var require_lib = __commonJS({
         return this._getProxyAgentDispatcher(parsedUrl, proxyUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info2 = {};
-        info2.parsedUrl = requestUrl;
-        const usingSsl = info2.parsedUrl.protocol === "https:";
-        info2.httpModule = usingSsl ? https : http;
+        const info4 = {};
+        info4.parsedUrl = requestUrl;
+        const usingSsl = info4.parsedUrl.protocol === "https:";
+        info4.httpModule = usingSsl ? https : http;
         const defaultPort = usingSsl ? 443 : 80;
-        info2.options = {};
-        info2.options.host = info2.parsedUrl.hostname;
-        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
-        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
-        info2.options.method = method;
-        info2.options.headers = this._mergeHeaders(headers);
+        info4.options = {};
+        info4.options.host = info4.parsedUrl.hostname;
+        info4.options.port = info4.parsedUrl.port ? parseInt(info4.parsedUrl.port) : defaultPort;
+        info4.options.path = (info4.parsedUrl.pathname || "") + (info4.parsedUrl.search || "");
+        info4.options.method = method;
+        info4.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info2.options.headers["user-agent"] = this.userAgent;
+          info4.options.headers["user-agent"] = this.userAgent;
         }
-        info2.options.agent = this._getAgent(info2.parsedUrl);
+        info4.options.agent = this._getAgent(info4.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info2.options);
+            handler.prepareRequest(info4.options);
           }
         }
-        return info2;
+        return info4;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -19743,10 +19743,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       (0, command_1.issueCommand)("notice", (0, utils_1.toCommandProperties)(properties), message instanceof Error ? message.toString() : message);
     }
     exports2.notice = notice;
-    function info2(message) {
+    function info4(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports2.info = info2;
+    exports2.info = info4;
     function startGroup(name) {
       (0, command_1.issue)("group", name);
     }
@@ -24072,6 +24072,18 @@ async function chatCompletion(config, system, user) {
   }
   return content;
 }
+async function chatCompletionWithFallback(config, system, user, log = () => void 0) {
+  try {
+    return await chatCompletion(config, system, user);
+  } catch (primaryError) {
+    if (!config.fallback?.apiKey) {
+      throw primaryError;
+    }
+    const reason = primaryError instanceof Error ? primaryError.message : String(primaryError);
+    log(`Primary provider failed, switching to fallback: ${reason}`);
+    return chatCompletion(config.fallback, system, user);
+  }
+}
 function languageHint(language) {
   if (language === "zh") return "Write in Simplified Chinese.";
   if (language === "en") return "Write in English.";
@@ -24090,7 +24102,7 @@ async function loadTemplate(templatePath) {
   const language = languageMatch?.[1]?.trim() ?? void 0;
   return { system: dedented, language };
 }
-async function generateWithTemplate(config, templatePath, defaultSystem, userPrompt) {
+async function generateWithTemplate(config, templatePath, defaultSystem, userPrompt, log = () => void 0) {
   let system = defaultSystem;
   let language = config.language;
   if (templatePath) {
@@ -24103,7 +24115,7 @@ async function generateWithTemplate(config, templatePath, defaultSystem, userPro
   const mergedPrompt = `${userPrompt}
 
 ${languageHint(language)}`;
-  return chatCompletion({ ...config, language }, system, mergedPrompt);
+  return chatCompletionWithFallback({ ...config, language }, system, mergedPrompt, log);
 }
 
 // src/pr-summary.ts
@@ -24143,7 +24155,7 @@ async function runPrSummary(config, marker, maxDiffChars) {
     "Generate the PR description markdown."
   ].join("\n");
   const templatePath = core.getInput("template-path") || void 0;
-  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt);
+  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt, core.info);
   const commentId = await upsertComment(octokit, owner, repo, prNumber, marker, summary);
   const writeToBody = (core.getInput("write-to-body") || "false").toLowerCase() === "true";
   if (writeToBody) {
@@ -24186,7 +24198,7 @@ async function runReleaseNotes(config, tag, previousTagInput) {
     "Generate release notes markdown."
   ].join("\n");
   const templatePath = core2.getInput("template-path") || void 0;
-  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt);
+  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt, core2.info);
   const updateRelease = (core2.getInput("update-release") || "true").toLowerCase() !== "false";
   if (updateRelease) {
     await createOrUpdateRelease(octokit, owner, repo, tag, notes);
@@ -24196,12 +24208,21 @@ async function runReleaseNotes(config, tag, previousTagInput) {
 
 // src/index.ts
 function readConfig() {
-  return {
+  const fallbackKey = core3.getInput("fallback-api-key") || "";
+  const config = {
     apiKey: core3.getInput("api-key", { required: true }),
     apiBase: core3.getInput("api-base") || "https://api.openai.com/v1",
     model: core3.getInput("model") || "gpt-4o-mini",
     language: core3.getInput("language") || "auto"
   };
+  if (fallbackKey) {
+    config.fallback = {
+      apiKey: fallbackKey,
+      apiBase: core3.getInput("fallback-api-base") || "https://ark.cn-beijing.volces.com/api/v3",
+      model: core3.getInput("fallback-model") || "ep-20260227124242-vkgnb"
+    };
+  }
+  return config;
 }
 async function main() {
   const mode = core3.getInput("mode", { required: true });

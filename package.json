@@ -1,6 +1,6 @@
 {
   "name": "pr-genie",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI-powered GitHub Action for PR summaries and release notes",
   "private": true,
   "type": "module",

@@ -1,14 +1,18 @@
 export type Language = "zh" | "en" | "auto";
 
-export interface AiConfig {
+export interface AiProviderConfig {
   apiKey: string;
   apiBase: string;
   model: string;
+}
+
+export interface AiConfig extends AiProviderConfig {
   language: Language;
+  fallback?: AiProviderConfig;
 }
 
 export async function chatCompletion(
-  config: AiConfig,
+  config: AiProviderConfig,
   system: string,
   user: string,
 ): Promise<string> {
@@ -42,6 +46,24 @@ export async function chatCompletion(
     throw new Error("AI returned empty content");
   }
   return content;
+}
+
+export async function chatCompletionWithFallback(
+  config: AiConfig,
+  system: string,
+  user: string,
+  log: (message: string) => void = () => undefined,
+): Promise<string> {
+  try {
+    return await chatCompletion(config, system, user);
+  } catch (primaryError) {
+    if (!config.fallback?.apiKey) {
+      throw primaryError;
+    }
+    const reason = primaryError instanceof Error ? primaryError.message : String(primaryError);
+    log(`Primary provider failed, switching to fallback: ${reason}`);
+    return chatCompletion(config.fallback, system, user);
+  }
 }
 
 export function languageHint(language: Language): string {

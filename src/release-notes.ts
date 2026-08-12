@@ -56,7 +56,7 @@ export async function runReleaseNotes(
   ].join("\n");
 
   const templatePath = core.getInput("template-path") || undefined;
-  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt);
+  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt, core.info);
   const updateRelease = (core.getInput("update-release") || "true").toLowerCase() !== "false";
 
   if (updateRelease) {

@@ -21,6 +21,17 @@ inputs:
     description: Model name
     required: false
     default: gpt-4o-mini
+  fallback-api-key:
+    description: Fallback OpenAI-compatible API key (e.g. Doubao ARK)
+    required: false
+  fallback-api-base:
+    description: Fallback API base URL
+    required: false
+    default: https://ark.cn-beijing.volces.com/api/v3
+  fallback-model:
+    description: Fallback model or endpoint id
+    required: false
+    default: ep-20260227124242-vkgnb
   language:
     description: Output language (zh | en | auto)
     required: false

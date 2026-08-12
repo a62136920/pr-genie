@@ -56,7 +56,7 @@ export async function runPrSummary(
   ].join("\n");
 
   const templatePath = core.getInput("template-path") || undefined;
-  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt);
+  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt, core.info);
   const commentId = await upsertComment(octokit, owner, repo, prNumber, marker, summary);
 
   const writeToBody = (core.getInput("write-to-body") || "false").toLowerCase() === "true";

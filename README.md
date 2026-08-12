@@ -58,6 +58,29 @@ jobs:
 
 ---
 
+## 使用 Groq 免费 + 豆包备用（推荐）
+
+主接口用 `.env` 里的 **Groq 免费额度**，失败自动切 **豆包 ARK**：
+
+```yaml
+- uses: a62136920/pr-genie@v0.1.1
+  with:
+    mode: pr-summary
+    api-key: ${{ secrets.GROQ_API_KEY }}
+    api-base: https://api.groq.com/openai/v1
+    model: llama-3.1-8b-instant
+    fallback-api-key: ${{ secrets.DOUBAO_API_KEY }}
+    fallback-api-base: https://ark.cn-beijing.volces.com/api/v3
+    fallback-model: ep-20260227124242-vkgnb
+    language: zh
+```
+
+Secrets：`GROQ_API_KEY`（Groq）、`DOUBAO_API_KEY`（火山方舟 ARK）。
+
+完整示例见 [`examples/groq-doubao.yml`](examples/groq-doubao.yml)。
+
+---
+
 ## 使用 DeepSeek（更便宜）
 
 ```yaml

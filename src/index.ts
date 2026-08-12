@@ -4,12 +4,23 @@ import { runPrSummary } from "./pr-summary.js";
 import { runReleaseNotes } from "./release-notes.js";
 
 function readConfig(): AiConfig {
-  return {
+  const fallbackKey = core.getInput("fallback-api-key") || "";
+  const config: AiConfig = {
     apiKey: core.getInput("api-key", { required: true }),
     apiBase: core.getInput("api-base") || "https://api.openai.com/v1",
     model: core.getInput("model") || "gpt-4o-mini",
     language: (core.getInput("language") || "auto") as AiConfig["language"],
   };
+
+  if (fallbackKey) {
+    config.fallback = {
+      apiKey: fallbackKey,
+      apiBase: core.getInput("fallback-api-base") || "https://ark.cn-beijing.volces.com/api/v3",
+      model: core.getInput("fallback-model") || "ep-20260227124242-vkgnb",
+    };
+  }
+
+  return config;
 }
 
 async function main(): Promise<void> {

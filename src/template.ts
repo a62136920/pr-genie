@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { chatCompletion, languageHint, type AiConfig, type Language } from "./ai.js";
+import { chatCompletionWithFallback, languageHint, type AiConfig, type Language } from "./ai.js";
 
 export interface PromptTemplate {
   system: string;
@@ -30,6 +30,7 @@ export async function generateWithTemplate(
   templatePath: string | undefined,
   defaultSystem: string,
   userPrompt: string,
+  log: (message: string) => void = () => undefined,
 ): Promise<string> {
   let system = defaultSystem;
   let language = config.language;
@@ -43,5 +44,5 @@ export async function generateWithTemplate(
   }
 
   const mergedPrompt = `${userPrompt}\n\n${languageHint(language)}`;
-  return chatCompletion({ ...config, language }, system, mergedPrompt);
+  return chatCompletionWithFallback({ ...config, language }, system, mergedPrompt, log);
 }
