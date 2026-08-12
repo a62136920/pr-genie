@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PR Genie — AI PR 描述 & Release Notes</title>
+  <meta name="description" content="零服务器 GitHub Action，AI 自动生成 PR 描述和 Release Notes。" />
+  <style>
+    :root { --bg:#0f0a1a; --card:#1a1230; --accent:#a855f7; --text:#f3e8ff; --muted:#c4b5fd; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    .wrap { max-width:880px; margin:0 auto; padding:48px 20px 80px; }
+    h1 { font-size:2.4rem; margin:0 0 12px; }
+    .tag { display:inline-block; background:var(--accent); color:#fff; padding:4px 12px; border-radius:999px; font-size:.85rem; margin-bottom:24px; }
+    .card { background:var(--card); border:1px solid #3b2763; border-radius:16px; padding:24px; margin:20px 0; }
+    pre { background:#12082a; padding:16px; border-radius:12px; overflow:auto; font-size:.85rem; }
+    a { color:#e9d5ff; }
+    .btns { display:flex; gap:12px; flex-wrap:wrap; margin-top:24px; }
+    .btn { display:inline-block; padding:12px 20px; border-radius:10px; text-decoration:none; font-weight:600; }
+    .btn-primary { background:var(--accent); color:#fff; }
+    .btn-secondary { border:1px solid var(--accent); color:var(--text); }
+    ul { padding-left:1.2rem; }
+    li { margin:6px 0; }
+    footer { margin-top:48px; color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="tag">GitHub Action · 开源 MIT</span>
+    <h1>PR Genie ✨</h1>
+    <p>用 AI 自动生成 PR 描述和 Release Notes。零服务器，5 分钟接入，支持 OpenAI / DeepSeek 等兼容 API。</p>
+
+    <div class="btns">
+      <a class="btn btn-primary" href="https://github.com/a62136920/pr-genie">GitHub 仓库</a>
+      <a class="btn btn-secondary" href="https://github.com/a62136920/pr-genie#快速开始">快速开始</a>
+    </div>
+
+    <div class="card">
+      <h2>功能</h2>
+      <ul>
+        <li>PR 打开 → 自动评论：概要 / 变更 / 测试建议 / 风险</li>
+        <li>推送 tag → 自动生成 Release Notes</li>
+        <li>中英文输出 · 自定义 Pro 模板</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>快速接入</h2>
+      <pre><code>name: PR Summary
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: a62136920/pr-genie@v0.1.0
+        with:
+          mode: pr-summary
+          api-key: ${{ secrets.OPENAI_API_KEY }}
+          language: zh</code></pre>
+    </div>
+
+    <div class="card">
+      <h2>定价</h2>
+      <ul>
+        <li><strong>Free</strong> — 开源，PR 摘要 + Release Notes</li>
+        <li><strong>Pro</strong> — 行业模板包 ¥99（前端 / 后端 / 用户向发版）</li>
+        <li><strong>Team</strong> — 多仓库统一配置 ¥199/月</li>
+      </ul>
+    </div>
+
+    <footer>
+      <p>© PR Genie · <a href="https://xinrongstar.chat">xinrongstar.chat</a></p>
+    </footer>
+  </div>
+</body>
+</html>

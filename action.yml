@@ -1,0 +1,62 @@
+name: PR Genie
+description: AI-powered PR summaries and release notes for GitHub
+author: pr-genie
+
+branding:
+  icon: sparkles
+  color: purple
+
+inputs:
+  mode:
+    description: "pr-summary | release-notes"
+    required: true
+  api-key:
+    description: OpenAI-compatible API key
+    required: true
+  api-base:
+    description: API base URL (default https://api.openai.com/v1)
+    required: false
+    default: https://api.openai.com/v1
+  model:
+    description: Model name
+    required: false
+    default: gpt-4o-mini
+  language:
+    description: Output language (zh | en | auto)
+    required: false
+    default: auto
+  template-path:
+    description: Path to YAML prompt template (Pro)
+    required: false
+  max-diff-chars:
+    description: Max diff characters sent to AI
+    required: false
+    default: "120000"
+  comment-marker:
+    description: Hidden marker to identify bot comments
+    required: false
+    default: "<!-- pr-genie -->"
+  write-to-body:
+    description: Overwrite PR description body (pr-summary mode)
+    required: false
+    default: "false"
+  update-release:
+    description: Create or update GitHub Release body (release-notes mode)
+    required: false
+    default: "true"
+  tag:
+    description: Release tag (release-notes mode only)
+    required: false
+  previous-tag:
+    description: Previous tag for comparison (release-notes mode only)
+    required: false
+
+outputs:
+  summary:
+    description: Generated text
+  comment-id:
+    description: PR comment ID (pr-summary mode)
+
+runs:
+  using: node20
+  main: dist/index.js

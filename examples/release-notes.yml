@@ -1,0 +1,25 @@
+name: Release Notes
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        uses: ./
+        with:
+          mode: release-notes
+          tag: ${{ github.ref_name }}
+          api-key: ${{ secrets.OPENAI_API_KEY }}
+          language: zh
