@@ -34,7 +34,7 @@ export async function runPrSummary(
     throw new Error("This action must run on pull_request or issue_comment events");
   }
 
-  const pull = await octokit.pulls.get({ owner, repo, pull_number: prNumber });
+  const pull = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
   let diff = await getPrDiff(octokit, owner, repo, prNumber);
   if (diff.length > maxDiffChars) {
     diff = `${diff.slice(0, maxDiffChars)}\n\n...[diff truncated]`;
