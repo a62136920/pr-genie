@@ -1,11 +1,11 @@
 {
   "name": "pr-genie",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "AI-powered GitHub Action for PR summaries and release notes",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.cjs",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"
   },
