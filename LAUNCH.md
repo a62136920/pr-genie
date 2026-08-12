@@ -12,9 +12,11 @@
 
 ## 需要你时
 
-- [ ] GitHub 账号：创建公开仓库 `pr-genie` 并推送
+- [x] GitHub 账号：创建公开仓库 `pr-genie` 并推送 → https://github.com/a62136920/pr-genie
+- [x] Release v0.1.0 已发布
+- [x] GitHub Pages 已开（docs/ + CNAME pr-genie.xinrongstar.chat）
+- [ ] DNS：在域名面板添加 `pr-genie` CNAME → `a62136920.github.io`（见 ../域名.md）
 - [ ] （可选）DeepSeek API Key：dogfood 测试
-- [ ] DNS：添加 `pr-genie` CNAME → `a62136920.github.io`（GitHub Pages）
 
 ## 发布后 7 天
 

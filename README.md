@@ -4,6 +4,9 @@
 > 零服务器 · 自带 API Key · 支持 OpenAI / DeepSeek 等兼容接口
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/a62136920/pr-genie)](https://github.com/a62136920/pr-genie/releases)
+
+🌐 落地页：[pr-genie.xinrongstar.chat](https://pr-genie.xinrongstar.chat)（DNS 生效后可用）
 
 ---
 
