@@ -1,13 +1,14 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import type { Octokit } from "@octokit/rest";
 
-export function getOctokit(): Octokit {
+export type OctokitClient = ReturnType<typeof github.getOctokit>;
+
+export function getOctokit(): OctokitClient {
   const token = core.getInput("github-token") || process.env.GITHUB_TOKEN;
   if (!token) {
     throw new Error("GitHub token not found. Set github-token input or GITHUB_TOKEN env.");
   }
-  return github.getOctokit(token) as unknown as Octokit;
+  return github.getOctokit(token);
 }
 
 export function getRepoContext(): { owner: string; repo: string } {
@@ -16,12 +17,12 @@ export function getRepoContext(): { owner: string; repo: string } {
 }
 
 export async function getPrDiff(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   pullNumber: number,
 ): Promise<string> {
-  const response = await octokit.pulls.get({
+  const response = await octokit.rest.pulls.get({
     owner,
     repo,
     pull_number: pullNumber,
@@ -31,13 +32,13 @@ export async function getPrDiff(
 }
 
 export async function findBotComment(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   issueNumber: number,
   marker: string,
 ): Promise<number | undefined> {
-  const comments = await octokit.paginate(octokit.issues.listComments, {
+  const comments = await octokit.paginate(octokit.rest.issues.listComments, {
     owner,
     repo,
     issue_number: issueNumber,
@@ -49,7 +50,7 @@ export async function findBotComment(
 }
 
 export async function upsertComment(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   issueNumber: number,
@@ -60,7 +61,7 @@ export async function upsertComment(
   const existingId = await findBotComment(octokit, owner, repo, issueNumber, marker);
 
   if (existingId) {
-    const updated = await octokit.issues.updateComment({
+    const updated = await octokit.rest.issues.updateComment({
       owner,
       repo,
       comment_id: existingId,
@@ -69,7 +70,7 @@ export async function upsertComment(
     return updated.data.id;
   }
 
-  const created = await octokit.issues.createComment({
+  const created = await octokit.rest.issues.createComment({
     owner,
     repo,
     issue_number: issueNumber,
@@ -79,13 +80,13 @@ export async function upsertComment(
 }
 
 export async function updatePrBody(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   pullNumber: number,
   body: string,
 ): Promise<void> {
-  await octokit.pulls.update({
+  await octokit.rest.pulls.update({
     owner,
     repo,
     pull_number: pullNumber,
@@ -94,12 +95,12 @@ export async function updatePrBody(
 }
 
 export async function listMergedPullRequests(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   since?: string,
 ): Promise<Array<{ number: number; title: string; user: string; body: string }>> {
-  const pulls = await octokit.paginate(octokit.pulls.list, {
+  const pulls = await octokit.paginate(octokit.rest.pulls.list, {
     owner,
     repo,
     state: "closed",
@@ -122,13 +123,13 @@ export async function listMergedPullRequests(
 }
 
 export async function listCommitsSinceTag(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   previousTag?: string,
 ): Promise<Array<{ sha: string; message: string; author: string }>> {
   if (!previousTag) {
-    const commits = await octokit.paginate(octokit.repos.listCommits, {
+    const commits = await octokit.paginate(octokit.rest.repos.listCommits, {
       owner,
       repo,
       per_page: 100,
@@ -140,7 +141,7 @@ export async function listCommitsSinceTag(
     }));
   }
 
-  const response = await octokit.repos.compareCommitsWithBasehead({
+  const response = await octokit.rest.repos.compareCommitsWithBasehead({
     owner,
     repo,
     basehead: `${previousTag}...HEAD`,
@@ -154,13 +155,13 @@ export async function listCommitsSinceTag(
 }
 
 export async function getTagDate(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   tag: string,
 ): Promise<string | undefined> {
   try {
-    const ref = await octokit.git.getRef({
+    const ref = await octokit.rest.git.getRef({
       owner,
       repo,
       ref: `tags/${tag}`,
@@ -169,11 +170,11 @@ export async function getTagDate(
     const objectSha = ref.data.object.sha;
 
     if (objectType === "tag") {
-      const tagObj = await octokit.git.getTag({ owner, repo, tag_sha: objectSha });
+      const tagObj = await octokit.rest.git.getTag({ owner, repo, tag_sha: objectSha });
       return tagObj.data.tagger?.date;
     }
 
-    const commit = await octokit.git.getCommit({ owner, repo, commit_sha: objectSha });
+    const commit = await octokit.rest.git.getCommit({ owner, repo, commit_sha: objectSha });
     return commit.data.committer?.date;
   } catch {
     return undefined;
@@ -181,12 +182,12 @@ export async function getTagDate(
 }
 
 export async function getLatestTag(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   excludeTag?: string,
 ): Promise<string | undefined> {
-  const tags = await octokit.paginate(octokit.repos.listTags, {
+  const tags = await octokit.paginate(octokit.rest.repos.listTags, {
     owner,
     repo,
     per_page: 30,
@@ -205,15 +206,15 @@ export async function getLatestTag(
 }
 
 export async function createOrUpdateRelease(
-  octokit: Octokit,
+  octokit: OctokitClient,
   owner: string,
   repo: string,
   tag: string,
   notes: string,
 ): Promise<void> {
   try {
-    const existing = await octokit.repos.getReleaseByTag({ owner, repo, tag });
-    await octokit.repos.updateRelease({
+    const existing = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
+    await octokit.rest.repos.updateRelease({
       owner,
       repo,
       release_id: existing.data.id,
@@ -224,7 +225,7 @@ export async function createOrUpdateRelease(
     // release may not exist yet
   }
 
-  await octokit.repos.createRelease({
+  await octokit.rest.repos.createRelease({
     owner,
     repo,
     tag_name: tag,

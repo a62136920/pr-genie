@@ -23899,7 +23899,7 @@ function getRepoContext() {
   return { owner, repo };
 }
 async function getPrDiff(octokit, owner, repo, pullNumber) {
-  const response = await octokit.pulls.get({
+  const response = await octokit.rest.pulls.get({
     owner,
     repo,
     pull_number: pullNumber,
@@ -23908,7 +23908,7 @@ async function getPrDiff(octokit, owner, repo, pullNumber) {
   return String(response.data);
 }
 async function findBotComment(octokit, owner, repo, issueNumber, marker) {
-  const comments = await octokit.paginate(octokit.issues.listComments, {
+  const comments = await octokit.paginate(octokit.rest.issues.listComments, {
     owner,
     repo,
     issue_number: issueNumber,
@@ -23922,7 +23922,7 @@ async function upsertComment(octokit, owner, repo, issueNumber, marker, body) {
 ${body}`;
   const existingId = await findBotComment(octokit, owner, repo, issueNumber, marker);
   if (existingId) {
-    const updated = await octokit.issues.updateComment({
+    const updated = await octokit.rest.issues.updateComment({
       owner,
       repo,
       comment_id: existingId,
@@ -23930,7 +23930,7 @@ ${body}`;
     });
     return updated.data.id;
   }
-  const created = await octokit.issues.createComment({
+  const created = await octokit.rest.issues.createComment({
     owner,
     repo,
     issue_number: issueNumber,
@@ -23939,7 +23939,7 @@ ${body}`;
   return created.data.id;
 }
 async function updatePrBody(octokit, owner, repo, pullNumber, body) {
-  await octokit.pulls.update({
+  await octokit.rest.pulls.update({
     owner,
     repo,
     pull_number: pullNumber,
@@ -23947,7 +23947,7 @@ async function updatePrBody(octokit, owner, repo, pullNumber, body) {
   });
 }
 async function listMergedPullRequests(octokit, owner, repo, since) {
-  const pulls = await octokit.paginate(octokit.pulls.list, {
+  const pulls = await octokit.paginate(octokit.rest.pulls.list, {
     owner,
     repo,
     state: "closed",
@@ -23965,7 +23965,7 @@ async function listMergedPullRequests(octokit, owner, repo, since) {
 }
 async function listCommitsSinceTag(octokit, owner, repo, previousTag) {
   if (!previousTag) {
-    const commits = await octokit.paginate(octokit.repos.listCommits, {
+    const commits = await octokit.paginate(octokit.rest.repos.listCommits, {
       owner,
       repo,
       per_page: 100
@@ -23976,7 +23976,7 @@ async function listCommitsSinceTag(octokit, owner, repo, previousTag) {
       author: commit.commit.author?.name ?? "unknown"
     }));
   }
-  const response = await octokit.repos.compareCommitsWithBasehead({
+  const response = await octokit.rest.repos.compareCommitsWithBasehead({
     owner,
     repo,
     basehead: `${previousTag}...HEAD`
@@ -23989,7 +23989,7 @@ async function listCommitsSinceTag(octokit, owner, repo, previousTag) {
 }
 async function getTagDate(octokit, owner, repo, tag) {
   try {
-    const ref = await octokit.git.getRef({
+    const ref = await octokit.rest.git.getRef({
       owner,
       repo,
       ref: `tags/${tag}`
@@ -23997,17 +23997,17 @@ async function getTagDate(octokit, owner, repo, tag) {
     const objectType = ref.data.object.type;
     const objectSha = ref.data.object.sha;
     if (objectType === "tag") {
-      const tagObj = await octokit.git.getTag({ owner, repo, tag_sha: objectSha });
+      const tagObj = await octokit.rest.git.getTag({ owner, repo, tag_sha: objectSha });
       return tagObj.data.tagger?.date;
     }
-    const commit = await octokit.git.getCommit({ owner, repo, commit_sha: objectSha });
+    const commit = await octokit.rest.git.getCommit({ owner, repo, commit_sha: objectSha });
     return commit.data.committer?.date;
   } catch {
     return void 0;
   }
 }
 async function getLatestTag(octokit, owner, repo, excludeTag) {
-  const tags = await octokit.paginate(octokit.repos.listTags, {
+  const tags = await octokit.paginate(octokit.rest.repos.listTags, {
     owner,
     repo,
     per_page: 30
@@ -24024,8 +24024,8 @@ async function getLatestTag(octokit, owner, repo, excludeTag) {
 }
 async function createOrUpdateRelease(octokit, owner, repo, tag, notes) {
   try {
-    const existing = await octokit.repos.getReleaseByTag({ owner, repo, tag });
-    await octokit.repos.updateRelease({
+    const existing = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag });
+    await octokit.rest.repos.updateRelease({
       owner,
       repo,
       release_id: existing.data.id,
@@ -24034,7 +24034,7 @@ async function createOrUpdateRelease(octokit, owner, repo, tag, notes) {
     return;
   } catch {
   }
-  await octokit.repos.createRelease({
+  await octokit.rest.repos.createRelease({
     owner,
     repo,
     tag_name: tag,
@@ -24138,7 +24138,7 @@ async function runPrSummary(config, marker, maxDiffChars) {
   if (!prNumber) {
     throw new Error("This action must run on pull_request or issue_comment events");
   }
-  const pull = await octokit.pulls.get({ owner, repo, pull_number: prNumber });
+  const pull = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
   let diff = await getPrDiff(octokit, owner, repo, prNumber);
   if (diff.length > maxDiffChars) {
     diff = `${diff.slice(0, maxDiffChars)}
