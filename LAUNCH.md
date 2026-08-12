@@ -17,7 +17,7 @@
 - [x] GitHub Pages 已开（docs/ + CNAME pr-genie.xinrongstar.chat）
 - [ ] DNS：在域名面板添加 `pr-genie` CNAME → `a62136920.github.io`（见 ../域名.md）
 - [x] GitHub Secrets：`GROQ_API_KEY` + `DOUBAO_API_KEY` 已配置
-- [ ] dogfood workflow：需 PAT 增加 `workflow` scope 后推送 `.github/workflows/pr-summary.yml`（或 GitHub 网页手动粘贴 `examples/groq-doubao.yml`）
+- [x] dogfood workflow 已推送（`.github/workflows/pr-summary.yml`）
 
 ## 发布后 7 天
 
