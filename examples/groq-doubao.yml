@@ -14,8 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: a62136920/pr-genie@v0.1.0
+      - uses: a62136920/pr-genie@v0.1.2
         with:
+          github-token: ${{ github.token }}
           mode: pr-summary
           api-key: ${{ secrets.GROQ_API_KEY }}
           api-base: https://api.groq.com/openai/v1

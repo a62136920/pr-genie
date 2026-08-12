@@ -17,6 +17,7 @@ jobs:
       - name: Generate PR summary
         uses: ./
         with:
+          github-token: ${{ github.token }}
           mode: pr-summary
           api-key: ${{ secrets.GROQ_API_KEY }}
           api-base: https://api.groq.com/openai/v1
