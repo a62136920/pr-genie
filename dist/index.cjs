@@ -19674,7 +19674,7 @@ var require_core = __commonJS({
       process.env["PATH"] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
     }
     exports2.addPath = addPath;
-    function getInput4(name, options) {
+    function getInput5(name, options) {
       const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
       if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
@@ -19684,9 +19684,9 @@ var require_core = __commonJS({
       }
       return val.trim();
     }
-    exports2.getInput = getInput4;
+    exports2.getInput = getInput5;
     function getMultilineInput(name, options) {
-      const inputs = getInput4(name, options).split("\n").filter((x) => x !== "");
+      const inputs = getInput5(name, options).split("\n").filter((x) => x !== "");
       if (options && options.trimWhitespace === false) {
         return inputs;
       }
@@ -19696,7 +19696,7 @@ var require_core = __commonJS({
     function getBooleanInput(name, options) {
       const trueValue = ["true", "True", "TRUE"];
       const falseValue = ["false", "False", "FALSE"];
-      const val = getInput4(name, options);
+      const val = getInput5(name, options);
       if (trueValue.includes(val))
         return true;
       if (falseValue.includes(val))
@@ -23878,16 +23878,21 @@ var require_github = __commonJS({
 });
 
 // src/index.ts
-var core3 = __toESM(require_core(), 1);
+var core4 = __toESM(require_core(), 1);
 
 // src/pr-summary.ts
-var core = __toESM(require_core(), 1);
+var core2 = __toESM(require_core(), 1);
 var github2 = __toESM(require_github(), 1);
 
 // src/github.ts
 var github = __toESM(require_github(), 1);
+var core = __toESM(require_core(), 1);
 function getOctokit2() {
-  return github.getOctokit(process.env.GITHUB_TOKEN ?? "");
+  const token = core.getInput("github-token") || process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error("GitHub token not found. Set github-token input or GITHUB_TOKEN env.");
+  }
+  return github.getOctokit(token);
 }
 function getRepoContext() {
   const { owner, repo } = github.context.repo;
@@ -24154,10 +24159,10 @@ async function runPrSummary(config, marker, maxDiffChars) {
     "",
     "Generate the PR description markdown."
   ].join("\n");
-  const templatePath = core.getInput("template-path") || void 0;
-  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt, core.info);
+  const templatePath = core2.getInput("template-path") || void 0;
+  const summary = await generateWithTemplate(config, templatePath, PR_SYSTEM, userPrompt, core2.info);
   const commentId = await upsertComment(octokit, owner, repo, prNumber, marker, summary);
-  const writeToBody = (core.getInput("write-to-body") || "false").toLowerCase() === "true";
+  const writeToBody = (core2.getInput("write-to-body") || "false").toLowerCase() === "true";
   if (writeToBody) {
     await updatePrBody(octokit, owner, repo, prNumber, summary);
   }
@@ -24165,7 +24170,7 @@ async function runPrSummary(config, marker, maxDiffChars) {
 }
 
 // src/release-notes.ts
-var core2 = __toESM(require_core(), 1);
+var core3 = __toESM(require_core(), 1);
 var RELEASE_SYSTEM = `You are a release manager writing clear GitHub Release Notes.
 Output markdown with:
 ## Highlights
@@ -24197,9 +24202,9 @@ async function runReleaseNotes(config, tag, previousTagInput) {
     "",
     "Generate release notes markdown."
   ].join("\n");
-  const templatePath = core2.getInput("template-path") || void 0;
-  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt, core2.info);
-  const updateRelease = (core2.getInput("update-release") || "true").toLowerCase() !== "false";
+  const templatePath = core3.getInput("template-path") || void 0;
+  const notes = await generateWithTemplate(config, templatePath, RELEASE_SYSTEM, userPrompt, core3.info);
+  const updateRelease = (core3.getInput("update-release") || "true").toLowerCase() !== "false";
   if (updateRelease) {
     await createOrUpdateRelease(octokit, owner, repo, tag, notes);
   }
@@ -24208,50 +24213,50 @@ async function runReleaseNotes(config, tag, previousTagInput) {
 
 // src/index.ts
 function readConfig() {
-  const fallbackKey = core3.getInput("fallback-api-key") || "";
+  const fallbackKey = core4.getInput("fallback-api-key") || "";
   const config = {
-    apiKey: core3.getInput("api-key", { required: true }),
-    apiBase: core3.getInput("api-base") || "https://api.openai.com/v1",
-    model: core3.getInput("model") || "gpt-4o-mini",
-    language: core3.getInput("language") || "auto"
+    apiKey: core4.getInput("api-key", { required: true }),
+    apiBase: core4.getInput("api-base") || "https://api.openai.com/v1",
+    model: core4.getInput("model") || "gpt-4o-mini",
+    language: core4.getInput("language") || "auto"
   };
   if (fallbackKey) {
     config.fallback = {
       apiKey: fallbackKey,
-      apiBase: core3.getInput("fallback-api-base") || "https://ark.cn-beijing.volces.com/api/v3",
-      model: core3.getInput("fallback-model") || "ep-20260227124242-vkgnb"
+      apiBase: core4.getInput("fallback-api-base") || "https://ark.cn-beijing.volces.com/api/v3",
+      model: core4.getInput("fallback-model") || "ep-20260227124242-vkgnb"
     };
   }
   return config;
 }
 async function main() {
-  const mode = core3.getInput("mode", { required: true });
+  const mode = core4.getInput("mode", { required: true });
   const config = readConfig();
-  const marker = core3.getInput("comment-marker") || "<!-- pr-genie -->";
-  const maxDiffChars = Number(core3.getInput("max-diff-chars") || "120000");
+  const marker = core4.getInput("comment-marker") || "<!-- pr-genie -->";
+  const maxDiffChars = Number(core4.getInput("max-diff-chars") || "120000");
   if (mode === "pr-summary") {
     const result = await runPrSummary(config, marker, maxDiffChars);
-    core3.setOutput("summary", result.summary);
-    core3.setOutput("comment-id", String(result.commentId));
-    core3.info(`PR summary posted (comment #${result.commentId})`);
+    core4.setOutput("summary", result.summary);
+    core4.setOutput("comment-id", String(result.commentId));
+    core4.info(`PR summary posted (comment #${result.commentId})`);
     return;
   }
   if (mode === "release-notes") {
-    const tag = core3.getInput("tag") || process.env.GITHUB_REF_NAME || "";
+    const tag = core4.getInput("tag") || process.env.GITHUB_REF_NAME || "";
     if (!tag) {
       throw new Error("release-notes mode requires tag input or GITHUB_REF_NAME");
     }
-    const previousTag = core3.getInput("previous-tag") || void 0;
+    const previousTag = core4.getInput("previous-tag") || void 0;
     const notes = await runReleaseNotes(config, tag, previousTag);
-    core3.setOutput("summary", notes);
-    core3.info(`Release notes generated for ${tag}`);
+    core4.setOutput("summary", notes);
+    core4.info(`Release notes generated for ${tag}`);
     return;
   }
   throw new Error(`Unknown mode: ${mode}. Use pr-summary or release-notes.`);
 }
 main().catch((error) => {
   const message = error instanceof Error ? error.message : String(error);
-  core3.setFailed(message);
+  core4.setFailed(message);
 });
 /*! Bundled license information:
 

@@ -1,8 +1,13 @@
 import * as github from "@actions/github";
+import * as core from "@actions/core";
 import type { Octokit } from "@octokit/rest";
 
 export function getOctokit(): Octokit {
-  return github.getOctokit(process.env.GITHUB_TOKEN ?? "") as unknown as Octokit;
+  const token = core.getInput("github-token") || process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error("GitHub token not found. Set github-token input or GITHUB_TOKEN env.");
+  }
+  return github.getOctokit(token) as unknown as Octokit;
 }
 
 export function getRepoContext(): { owner: string; repo: string } {
